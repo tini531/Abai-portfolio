@@ -326,6 +326,23 @@ body, a, button, .logo, .project-card {
     /* 懸停時除了縮放，增加一個微小的轉向 */
     transform: scale(1.05) rotateY(2deg) rotateX(1deg);
 }
+.project-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: skewX(-25deg);
+    transition: 0.5s;
+    z-index: 1;
+}
+
+.project-card:hover::after {
+    left: 150%;
+    transition: 0.5s;
+}
 
 /* 進度條 */
 .progress-container {
@@ -363,9 +380,91 @@ nav.scrolled + .progress-container,
     transform: translate(-50%, -45%) scale(1.1);
     transition: transform 0.2s ease-out;
 }
+
+
+#loader {
+    position: fixed;
+    width: 100%; height: 100%;
+    background: #000;
+    z-index: 10000;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 1s ease;
+}
+
+
+/* 開場遮罩容器 */
+#loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000000;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 1s cubic-bezier(0.85, 0, 0.15, 1); /* 往上抽離的動畫 */
+}
+
+
+
+
+/* Loader 中的 Logo 動態 */
+.loader-content {
+    text-align: center;
+    overflow: hidden;
+}
+
+.loader-logo {
+    font-size: 2.5rem;
+    font-weight: 500;
+    letter-spacing: 0.2rem;
+    color: #fff;
+    text-transform: uppercase;
+    /* 初始狀態：隱藏在下方 */
+    transform: translateY(100%);
+    animation: revealLogo 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+/* 精密細線動畫 */
+.loader-line {
+    width: 0;
+    height: 1px;
+    background: #fff;
+    margin-top: 20px;
+    animation: growLine 1.2s ease-in-out forwards;
+    animation-delay: 0.3s;
+}
+
+/* 定義動畫軌跡 */
+@keyframes revealLogo {
+    to { transform: translateY(0); }
+}
+
+@keyframes growLine {
+    to { width: 120px; }
+}
+
+/* 遮罩退場狀態 */
+.loader-hidden {
+    transform: translateY(-100%) !important;
+}
+
+
     </style>
 </head>
 <body>
+
+<div id="loader">
+    <div class="loader-content">
+        <div class="loader-logo">Abai Portfolio | Industrial Design</div>
+        <div class="loader-line"></div>
+    </div>
+</div>
+
+    
 
     
 
@@ -399,8 +498,9 @@ nav.scrolled + .progress-container,
 
     <section id="work">
         <div class="mb-5" data-aos="fade-right">
-            <span style="font-size: 0.9rem; letter-spacing: 3px; ">專案分享</span>
-            <h2 style="font-size: 3rem; font-weight: 300; letter-spacing:0.2rem;">Selected Works</h2>
+            <span style="font-size: 0.9rem; letter-spacing: 3px; font-size:20px;">專案分享</span>
+             <h2 class="display-4  mb-4 font-size: 20px;"style="letter-spacing:0.2rem;">Selected Works</h2>
+            
         </div>
         
         <div class="portfolio-grid">
@@ -467,9 +567,14 @@ nav.scrolled + .progress-container,
             <source src="BK3.mp4" type="video/mp4">
         </video>
         <div class="position-relative z-1" data-aos="zoom-in">
-            <h2 class="display-3 fw-bold " style="font-weight: 500;">Let's Create Together</h2>
-            <p class="mb-5 text-sub " style="letter-spacing:0.2rem !important;">有任何想法或合作機會？隨時與我聯繫。</p>
-            <a href="mailto:abaiabai0689@gmail.com" class="btn-contact">Say Hello</a>
+            <h2 class="display-3 fw-bold mb-3" style="font-weight: 500;">Let's Create Together</h2>
+            <p class="mb-1 text-sub " style="font-weight:300; letter-spacing:0.2rem !important;">有任何想法或合作機會？隨時與我聯繫。<br>
+            <img src="icon1.png" style="width:30px; height:30px">abaiabai0689@gmail.com</p>
+         <a href="https://mail.google.com/mail/?view=cm&fs=1&to=abaiabai0689@gmail.com" target="_blank" class="btn-contact">Say Hello</a>
+           
+</a>
+
+</a>
         </div>
     </section>
 
@@ -707,6 +812,44 @@ window.addEventListener('scroll', () => {
     let scrollPos = window.pageYOffset;
     // 隨捲動輕微調整影片 Y 軸位置
     video.style.transform = `translate(-50%, calc(-50% + ${scrollPos * 0.05}px)) scale(1.1)`;
+});
+
+
+
+const magnets = document.querySelectorAll('.btn-contact, .logo');
+magnets.forEach((magnet) => {
+    magnet.addEventListener('mousemove', (e) => {
+        const rect = magnet.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        magnet.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+    });
+    magnet.addEventListener('mouseleave', () => {
+        magnet.style.transform = `translate(0px, 0px)`;
+        magnet.style.transition = 'all 0.5s ease';
+    });
+});
+
+// 遮罩動畫
+window.addEventListener('load', () => {
+    const loader = document.getElementById('loader');
+    
+    // 設定開場動畫停留的時間 (1.5秒)
+    setTimeout(() => {
+        // 1. 讓 Logo 稍微縮小並淡出
+        document.querySelector('.loader-content').style.opacity = '0';
+        document.querySelector('.loader-content').style.transition = 'opacity 0.5s ease';
+        
+        // 2. 0.5秒後讓整個黑幕往上抽離
+        setTimeout(() => {
+            loader.classList.add('loader-hidden');
+            
+            // 3. 徹底從 DOM 移除，避免擋住點擊
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 1000); // 對應 CSS 的 1s transition
+        }, 300);
+    }, 1500); 
 });
     </script>
 
