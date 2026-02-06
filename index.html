@@ -316,11 +316,60 @@ body, a, button, .logo, .project-card {
     background-color: rgba(255, 255, 255, 0.1);
     border-color: #ffffff;
 }
+
+/* 卡牌 */
+.project-card {
+    /* 增加視距感 */
+    perspective: 1000px; 
+}
+.project-card:hover img {
+    /* 懸停時除了縮放，增加一個微小的轉向 */
+    transform: scale(1.05) rotateY(2deg) rotateX(1deg);
+}
+
+/* 進度條 */
+.progress-container {
+    position: fixed;
+    top: 70px; /* 這個數值要根據你 nav 的高度調整 */
+    left: 0;
+    width: 100%;
+    height: 2px; /* 進度條粗細 */
+    background: transparent;
+    z-index: 999; /* 略低於 nav 的 1000 */
+    transition: top 0.3s ease-in-out; /* 配合 nav 縮小時的動畫 */
+}
+
+/* 進度條本體 */
+.progress-bar {
+    height: 100%;
+    background: #ffffff; /* 進度條顏色 */
+    width: 0%;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); /* 增加一點發光感 */
+}
+
+/* 當導覽列縮小時，進度條也要跟著往上移 */
+nav.scrolled + .progress-container,
+#navbar.scrolled ~ .progress-container {
+    top: 60px; /* 縮小後的導覽列高度 */
+}
+
+
+/* 影片位移感 */
+.video-section {
+    overflow: hidden;
+}
+.bg-video {
+    /* 讓影片比容器稍微大一點點，才有移動空間 */
+    transform: translate(-50%, -45%) scale(1.1);
+    transition: transform 0.2s ease-out;
+}
     </style>
 </head>
 <body>
 
     
+
+
 
     <div class="cursor-dot"></div>
     <div class="cursor-outline"></div>
@@ -337,8 +386,13 @@ body, a, button, .logo, .project-card {
             <a href="#contact">Contact</a>
         </div>
     </nav>
+<!-- 進度條 -->
+<div class="progress-container">
+    <div class="progress-bar" id="scrollBar"></div>
+</div>
+
 <section id="home" class="hero">
-        <div id="particles-js"></div> <h1 data-aos="fade-up" style="font-weight:500 !important;"><span id="typed"></span></h1>
+        <div id="particles-js"></div> <h1 data-aos="fade-up" data-aos-duration="1500" data-aos-once="false" style="font-weight:500 !important;"><span id="typed"></span></h1>
         <p data-aos="fade-up" data-aos-delay="200" style="color:#aaa; font-size:18px;">專注於產品體驗與製造可行性，兼顧美感與工程邏輯，將機能轉化為直覺的產品語言。</p>
     </section>
    
@@ -388,7 +442,7 @@ body, a, button, .logo, .project-card {
         </video>
         <div class="container position-relative z-1">
             <div class="row align-items-center">
-                <div class="col-lg-6" data-aos="fade-right">
+                <div class="col-lg-6" data-aos="fade-up" data-aos-duration="1500" data-aos-once="false">
                     <span style="letter-spacing: 3px; ">關於我</span>
                     <h2 class="display-4  mb-4 font-size: 20px;"style="letter-spacing:0.2rem;">About Me</h2>
                     <p class="lead mb-4" style="letter-spacing:0.2rem;  opacity: 0.9; font-size: 16px; line-height:2rem;">
@@ -603,6 +657,60 @@ interactiveElements.forEach(el => {
     el.addEventListener("mouseenter", () => cursorOutline.classList.add("cursor-active"));
     el.addEventListener("mouseleave", () => cursorOutline.classList.remove("cursor-active"));
 });
+
+
+
+
+window.addEventListener('scroll', function() {
+    const nav = document.getElementById('navbar');
+    if (window.scrollY > 50) {
+        nav.style.padding = '1rem 5%';
+        nav.style.background = 'rgba(10, 10, 10, 0.9)';
+        nav.style.backdropFilter = 'blur(15px)';
+    } else {
+        nav.style.padding = '2rem 5%';
+        nav.style.background = 'rgba(10, 10, 10, 0.8)';
+        nav.style.backdropFilter = 'blur(10px)';
+    }
+});
+
+
+
+<!-- 進度條動畫 -->
+ window.addEventListener('scroll', () => {
+    // 計算捲動進度
+    const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrolled = (winScroll / height) * 100;
+    
+    // 更新進度條長度
+    const bar = document.getElementById("scrollBar");
+    if (bar) {
+        bar.style.width = scrolled + "%";
+    }
+
+    // 順便處理 Navbar 變色（如果還沒加的話）
+    const nav = document.getElementById('navbar');
+    if (winScroll > 50) {
+        nav.style.padding = '1rem 5%';
+        nav.style.background = 'rgba(10, 10, 10, 0.9)';
+    } else {
+        nav.style.padding = '2rem 5%';
+        nav.style.background = 'rgba(10, 10, 10, 0.8)';
+    }
+});
+
+
+// 影片位移感
+window.addEventListener('scroll', () => {
+    const video = document.querySelector('.bg-video');
+    let scrollPos = window.pageYOffset;
+    // 隨捲動輕微調整影片 Y 軸位置
+    video.style.transform = `translate(-50%, calc(-50% + ${scrollPos * 0.05}px)) scale(1.1)`;
+});
     </script>
+
+
+
 </body>
 </html>
